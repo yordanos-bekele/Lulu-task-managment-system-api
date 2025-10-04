@@ -9,11 +9,11 @@ import { Repository } from 'typeorm';
 export class AuthService {
     
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>){}
-    
+
     async signUp(userInfo:CreateUserDto){
 
         //find if the user exitsts 
-        const existedUser = await this.userRepository.findBy({email: userInfo.email})
+        const existedUser = await this.userRepository.findOneBy({email: userInfo.email})
         if (existedUser){
             throw new HttpException('User already exits with the email',HttpStatus.BAD_REQUEST)
         }
@@ -29,7 +29,7 @@ export class AuthService {
     }
 
     hashPassword = async (pwd:string)=>{
-        const hash = await bcrypt.hashPassword(pwd,Number(process.env.SALT_ROUNDS));
+        const hash = await bcrypt.hash(pwd,Number(process.env.SALT_ROUNDS));
         return hash;
     }
     verifyPassword = async (pwd:string, hashedPwd:string)=>{
